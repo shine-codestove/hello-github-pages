@@ -13,18 +13,86 @@
   </head>
   <body class="container">
     <h1>Page1</h1>
-    <table>
+    <table class="table table-hover">
       <tbody id="dataTable"></tbody>
     </table>
+    <form>
+      <label for="" class="form-label">Name</label>
+      <input
+        type="text"
+        name="name"
+        id="name"
+        class="form-control"
+        value="서귀포"
+      />
+      <label for="" class="form-label">City</label>
+      <input
+        type="text"
+        name="city"
+        id="city"
+        class="form-control"
+        value="서귀포시"
+      />
+      <label for="" class="form-label">Address</label>
+      <input
+        type="text"
+        name="address"
+        id="address"
+        class="form-control"
+        value="제주도 서귀포시"
+      />
+    </form>
+    <button class="btn btn-primary" onclick="submitData(event)">저장</button>
     <script>
-      fetch("https://250f-182-219-220-21.ngrok-free.app/tourist_spots/")
-        .then((response) => response.json())
-        .then((json) => {
-          const rows = json.spots.map((data) => {
-            return `<tr><td>${data.name}</td><td>${data.city}</td><td>${data.address}</td></tr>`;
+      function inquiryList() {
+        fetch("https://250f-182-219-220-21.ngrok-free.app/tourist_spots/")
+          .then((response) => response.json())
+          .then((json) => {
+            const rows = json.spots.map((data) => {
+              return `<tr><td>${data.name}</td><td>${data.city}</td><td>${data.address}</td></tr>`;
+            });
+            document.querySelector("#dataTable").innerHTML = rows.join("");
           });
-          document.querySelector("#dataTable").innerHTML = rows.join("");
-        });
+      }
+
+      function submitData(e) {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const city = document.getElementById("city").value;
+        const address = document.getElementById("address").value;
+        const requestData = {
+          name: name,
+          city: city,
+          address: address,
+          description: "description",
+          country: "country",
+        };
+
+        fetch(
+          "https://250f-182-219-220-21.ngrok-free.app/tourist_spots/save/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
+        )
+          .then((response) => {
+            console.log(response);
+            if (response.status === 200) {
+              alert("저장완료");
+            } else {
+              alert("저장실패");
+            }
+          })
+          .catch((e) => {
+            alert("저장실패");
+            console.error(e);
+          });
+      }
+
+      inquiryList();
     </script>
   </body>
 </html>
