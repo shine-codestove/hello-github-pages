@@ -20,7 +20,7 @@
       fetch("https://250f-182-219-220-21.ngrok-free.app/tourist_spots/")
         .then((response) => response.json())
         .then((json) => {
-          const rows = json.map((data) => {
+          const rows = json.spots.map((data) => {
             return `<tr><td>${data.name}</td><td>${data.city}</td><td>${data.address}</td></tr>`;
           });
           document.querySelector("#dataTable").innerHTML = rows.join("");
