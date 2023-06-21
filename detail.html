@@ -3,7 +3,138 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Detail</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script>
+      console.log("href", location.href);
+      console.log("search", location.search);
+
+      /**
+       * 상품 단건 조회 하는 함수
+       */
+      async function getProduct() {
+        //브라우져 url에서 product id 가져오기
+        const productId = location.search.slice(-1);
+        sessionStorage.setItem("prdid", productId);
+
+        //서버에 상품 단건1개 조회 요청
+        const response = await fetch(
+          `https://5683-14-39-99-50.ngrok-free.app/shop/product/${productId}/`
+        );
+        const json = await response.json();
+
+        //서버로 부터 응답된 정보로 화면에 값을 넣어주기
+        document.querySelector("#productImage").src = json.image_url;
+        document.querySelector("#productName").innerHTML =
+          json.korean_name + "<br> " + json.english_name;
+        document.querySelector("#roasting").innerText = json.roasting;
+
+        //20000 => 20,000
+        document.querySelector("#price").innerText =
+          json.price.toLocaleString() + "원";
+
+        //용량 옵션 만들기
+        // weight : [200, 500]
+        json.weight.forEach((w) => {
+          const option = document.createElement("option");
+          option.value = w;
+          option.innerText = w + "g";
+          document.querySelector("#selectWeight").appendChild(option);
+        });
+
+        //분쇄 옵션 만들기
+        // grind = ["분쇄", "홀빈"]
+        json.grind.forEach((g) => {
+          const option = document.createElement("option");
+          option.value = g;
+          option.innerText = g;
+          document.querySelector("#selectGrind").appendChild(option);
+        });
+      }
+
+      /**
+       * 상품 주문 하는 함수
+       */
+      async function orderProduct() {
+        const productId = sessionStorage.getItem("prdid");
+        const weight = document.querySelector("#selectWeight").value;
+        const grind = document.querySelector("#selectGrind").value;
+        fetch("https://5683-14-39-99-50.ngrok-free.app/shop/order/save/", {
+          method: "POST",
+          body: JSON.stringify({
+            product_id: productId,
+            weight: weight,
+            grind: grind,
+          }),
+        }).then((response) => {
+          console.log(response);
+          alert("저장완료");
+        });
+      }
+    </script>
   </head>
-  <body></body>
+  <body onload="getProduct()">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">MyPage</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="/hello-github-pages/"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="order.html">Order</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <section class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <img id="productImage" src="" alt="" />
+        </div>
+        <div class="col-lg-6">
+          <h5 id="productName"></h5>
+          <h5 id="roasting"></h5>
+          <h5 id="price"></h5>
+          <label for="selectWeight" class="form-label">옵션</label>
+          <select id="selectWeight" class="form-select" aria-label="select">
+            <option selected>용량을 선택하세요</option>
+          </select>
+
+          <label for="selectGrind" class="form-label">분쇄</label>
+          <select id="selectGrind" class="form-select" aria-label="select">
+            <option selected>분쇄도를 선택하세요</option>
+          </select>
+
+          <button class="btn btn-primary mt-3 w-100" onclick="orderProduct()">
+            주문하기
+          </button>
+        </div>
+      </div>
+    </section>
+    <footer></footer>
+  </body>
 </html>

@@ -39,7 +39,7 @@
 async function getProducts() {
   console.log("상품목록조회");
   const productListApiUrl =
-    "https://00dc-14-39-99-50.ngrok-free.app/shop/product/";
+    "https://5683-14-39-99-50.ngrok-free.app/shop/product/";
 
   //http method : GET
   const response = await fetch(productListApiUrl);
